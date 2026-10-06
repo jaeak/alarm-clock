@@ -1,4 +1,4 @@
-**Clock and Input Handling**
+# Clock and Input Handling
 
 ## PreScale Module
 
