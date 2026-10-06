@@ -10,7 +10,7 @@ A fully functional digital alarm clock implemented on an FPGA using VHDL. Design
 * **Multiplexed Display Driver:** Drives multi-digit 7-segment displays through high-frequency multiplexing, minimizing hardware pin usage while maintaining a flicker-free visual output.
 * **Input Debouncing:** Incorporates custom synchronization circuitry to eliminate mechanical switch bounce for reliable, glitch-free user inputs.
 
-## 💻 Tech Stack & Tools
+## Tech Stack & Tools
 * **Language:** VHDL
 * **Hardware:** Cyclone V FPGA (DE10-Standard)
 * **Design & Simulation Tools:** Intel Quartus Prime, ModelSim
