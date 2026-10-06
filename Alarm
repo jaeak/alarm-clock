@@ -1,0 +1,101 @@
+LIBRARY IEEE;
+use ieee.std_logic_1164.all;
+USE ieee.numeric_std.all; 
+
+
+--The alarm entity handles setting the alarm, checking if the alarm is active, and checking if the 
+--alarm time has been reached, therefore setting it off
+ENTITY Alarm IS
+    PORT (
+		  Q0, Q1, Q2, Q3, Q4, Q5 : IN std_logic_vector (3 downto 0); --Q inputs are the current running clocks time
+        clock, reset, increment, toggle, confirm, stop : IN  std_logic; --the alarm will run on a clock, have a reset button
+		  --the increment input is used to decide which value you are setting when setting the clock
+		  --toggle is to toggle between which values you are setting. confirm is to confirm setting the alarm
+		  --at the time you selected. and stop is to stop the alarm once its been activated
+        Seg0, Seg1, Seg2, Seg3, Seg4, Seg5 : OUT std_logic_vector(3 DOWNTO 0); --4 bit output of all the clock digit values
+		  armed, alarmActive : OUT std_logic --2 output signals that signal if the alarm is armed, and when the alarm is activated
+    );
+END Alarm;
+
+ARCHITECTURE Behaviour OF Alarm IS
+
+--we use running clock as a component as it allows you to hold and store a value when the hold values are 1
+--this is useful as we will need to hold the set alarm value
+COMPONENT RunningClock
+	PORT ( clock, reset, holdsec, holdmin, holdhr, incsec, incmin, inchr : IN std_logic;
+			 Seg0, Seg1, Seg2, Seg3, Seg4, Seg5 : OUT std_logic_vector (3 downto 0)
+			 );
+END COMPONENT;
+
+--we use the set time component as well because we will need to actually set the alarm
+COMPONENT SetTime 
+	PORT ( clock, reset, increment, toggle : IN std_logic;
+			 sechold, minhold, hrhold, incsec, incmin, inchr : OUT std_logic
+			 );
+END COMPONENT;
+
+SIGNAL alarmArmed, Match, AActive : std_logic; --signals that determine the alarms state
+--alarmArmed is 1 if the alarm is set to activate at a certain time by the user
+--match is a check signal to see if the current time matches the set alarm time
+--AActive signals if the alarm has been triggered, and is active or not
+
+SIGNAL Hsec, Hmin, Hhr, Isec, Imin, Ihr : std_logic; --these are hold signals. they decide which values are held, and when.
+																		--depending on if we are setting the alarm, or if we already set it
+SIGNAL X0, X1, X2, X3, X4, X5 : std_logic_vector (3 downto 0);
+--these are the time signals that we will use to compare, and see if they match the current time values
+
+BEGIN
+
+Match <= '1' WHEN Q0 = X0 AND Q1 = X1 AND Q2 = X2 AND Q3 = X3 AND Q4 = X4 AND Q5 = X5 ELSE '0';
+--here is the check. the match signal will be one if the inputted current time is equal to the alarm time that was set
+
+PROCESS(clock, reset) --we will start a process to both confirm the alarm, or stop it if it is armed
+BEGIN	--this is necessary because we want to remember if the alarm is armed, and if we stopped it or not
+    IF reset = '1' THEN
+        alarmArmed <= '0'; --when we reset, we want completely default values so alarm will be disarmed
+    ELSIF rising_edge(clock) THEN --on every rising edge of the clock
+        IF stop = '1' THEN --check if the alarm has been stopped
+            alarmArmed <= '0'; -- if it has, disarm the alarm
+        ELSIF confirm = '1' THEN --if the confirm button has been pressed
+            alarmArmed <= '1'; --arm the alarm.
+        END IF; 
+    END IF;
+END PROCESS;
+
+PROCESS(clock, reset) 
+BEGIN
+    IF reset = '1' THEN
+        AActive <= '0'; --hard reset resets the active alarm
+
+    ELSIF rising_edge(clock) THEN --clock rising edge
+        IF stop = '1' THEN --if the alarm is stopped
+            AActive <= '0'; --alarm will no longer be active
+        ELSIF alarmArmed = '1' AND Match = '1' THEN --if the alarm is armed and it matches the current running clock
+            AActive <= '1'; --activate the alarm (trigger it)
+        END IF;
+    END IF;
+END PROCESS;
+
+
+I0 : SetTime PORT MAP (clock => clock, reset => NOT reset, increment => increment, toggle => toggle,
+							  sechold => Hsec, minhold => Hmin, hrhold => Hhr, incsec => Isec, incmin => Imin, inchr => Ihr
+							  ); --port map set time to set the alarm. settime will decide which values increment and which are held
+									--reset is NOT reset since keys are active low
+							  
+I1 : RunningClock PORT MAP(clock => clock, reset => reset, holdsec => Hsec, holdmin => Hmin, holdhr => Hhr, incsec => Isec,
+									incmin => Imin, inchr => Ihr, Seg0 => X0, Seg1 => X1, Seg2 => X2, Seg3 => X3,
+									Seg4 => X4, Seg5 => X5);
+									--running clock is also used to set the time, using the reusable vhd file called running clock
+									--outputs of this are going to be compared to the running clocks inputs Q0 - 5
+
+Seg0 <= X0; --outputs for alarm specifically
+Seg1 <= X1;
+Seg2 <= X2;
+Seg3 <= X3;
+Seg4 <= X4;
+Seg5 <= X5;
+
+alarmActive <= AActive; --output signals showing when the alarm is active/triggered or armed
+armed <= alarmArmed;
+
+END Behaviour;
