@@ -1,4 +1,5 @@
 # FPGA Digital Alarm Clock (VHDL)
+> Developed as a collaborative project by **Jack Luk** and **Sumair Amrala**
 
 A fully functional digital alarm clock implemented on an FPGA using VHDL. Designed with a clean, modular hardware architecture, this project features precise timekeeping, FSM-driven mode control, custom alarm matching, and dynamic display multiplexing.
 
