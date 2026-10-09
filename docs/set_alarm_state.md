@@ -1,4 +1,4 @@
-# 2.4 Set Alarm State
+# Set Alarm State
 
 The **Set Alarm** state is encapsulated within its own module and serves as the final state in the overall FSM architecture. 
 
