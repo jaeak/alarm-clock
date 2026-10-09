@@ -1,4 +1,4 @@
-# 2.2 Display Time Module
+# Display Time Module
 
 This component is responsible for tracking and displaying the real-time (or custom-set) hours, minutes, and seconds. The system relies on a hierarchical structure of **Binary-Coded Decimal (BCD)** counters designed to mimic a standard clock format.
 
