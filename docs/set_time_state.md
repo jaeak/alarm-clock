@@ -1,4 +1,4 @@
-# 2.3 Set Time State
+# Set Time State
 
 The **Set Time** mode is built around a synchronous finite state machine (FSM) to handle manual time configuration. The FSM enables the system to track its current configuration mode and switch between setting different time values.
 
