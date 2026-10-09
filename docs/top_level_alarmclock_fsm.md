@@ -1,4 +1,4 @@
-# 2.5 Top-level AlarmClock FSM
+# Top-level AlarmClock FSM
 
 For the top-level entity, all previous files and modules are combined into a single master file to create a fully functional alarm clock finite state machine. 
 
